@@ -1,0 +1,302 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lemz-Oke MIDI Player with Lyrics</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font: 16px system-ui, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 16px;
+      background: #171321;
+      color: #fff;
+    }
+
+    button {
+      padding: 12px 18px;
+      margin: 4px;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    #play { background: #ffd76a; color: #211a2e; }
+    #pause { background: #b9a4ff; color: #211a2e; }
+
+    #status {
+      white-space: pre-wrap;
+      color: #b9f4d0;
+      background: #242033;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    #lyrics {
+      margin-top: 24px;
+      min-height: 150px;
+      padding: 24px 12px;
+      display: grid;
+      place-items: center;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      font-size: clamp(1.7rem, 5vw, 2.8rem);
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      color: #ffd76a;
+      background: #242033;
+      border: 1px solid #403653;
+      border-radius: 16px;
+    }
+
+    .subtitle {
+      color: #c9c1d8;
+      font-size: .95rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎹 Lemz-Oke MIDI Player</h1>
+  <p>Song: <strong>Trust in Me</strong></p>
+  <p class="subtitle">MIDI playback with synchronized embedded lyrics</p>
+
+  <button id="play">Load &amp; Play</button>
+  <button id="pause" disabled>Pause</button>
+
+  <div id="lyrics" aria-live="polite">♪ Ready to play ♪</div>
+
+  <h3>Player Status</h3>
+  <pre id="status">Page loaded. Click Load & Play.</pre>
+
+  <script type="module">
+    import * as Spessa from "./midi_test/spessasynth_bundle.mjs";
+
+    const status = document.querySelector("#status");
+    const lyrics = document.querySelector("#lyrics");
+    const playButton = document.querySelector("#play");
+    const pauseButton = document.querySelector("#pause");
+
+    let audioContext;
+    let synth;
+    let sequencer;
+    let loaded = false;
+
+    let lyricTimer;
+    let lyricEvents = [];
+    let startedAt = 0;
+    let pausedAt = 0;
+    let duration = 0;
+
+    window.audioContext = null;
+    window.midiSynth = null;
+    window.midiSequencer = null;
+
+    function log(message) {
+      status.textContent += "\n" + message;
+      status.scrollTop = status.scrollHeight;
+    }
+
+    function showLyrics(seconds) {
+      let current = "";
+
+      for (const event of lyricEvents) {
+        if (event.seconds > seconds) break;
+        current += event.text;
+      }
+
+      // MIDI lyric events may contain carriage returns as line breaks.
+      lyrics.textContent =
+        current.replace(/\r\n/g, "\n").replace(/\r/g, "\n").trim()
+        || "♪";
+    }
+
+    function startLyricClock() {
+      clearInterval(lyricTimer);
+
+      startedAt = performance.now() / 1000 - pausedAt;
+
+      lyricTimer = setInterval(() => {
+        const elapsed = performance.now() / 1000 - startedAt;
+        showLyrics(elapsed);
+
+        if (duration > 0 && elapsed >= duration) {
+          clearInterval(lyricTimer);
+          pauseButton.disabled = true;
+          playButton.disabled = false;
+          lyrics.textContent = "♪ Playback finished ♪";
+        }
+      }, 40);
+    }
+
+    window.addEventListener("error", event => {
+      log("PAGE ERROR: " + event.message);
+    });
+
+    window.addEventListener("unhandledrejection", event => {
+      log("ASYNC ERROR: " + (event.reason?.stack || event.reason));
+    });
+
+    playButton.addEventListener("click", async () => {
+      playButton.disabled = true;
+
+      try {
+        if (!loaded) {
+          log("Step 1: Creating AudioContext");
+
+          audioContext = new AudioContext();
+          window.audioContext = audioContext;
+          await audioContext.resume();
+
+          log("AudioContext state: " + audioContext.state);
+
+          log("Step 2: Loading audio worklet");
+          await audioContext.audioWorklet.addModule(
+            "./midi_test/spessasynth_processor.min.js"
+          );
+          log("Audio worklet loaded");
+
+          const SynthClass = Spessa.WorkletSynthesizer ?? Spessa.Yo;
+          const SequencerClass = Spessa.Sequencer ?? Spessa.Vo;
+
+          log("Exports: " + Object.keys(Spessa).join(", "));
+
+          if (!SynthClass || !SequencerClass) {
+            throw new Error("Synthesizer or Sequencer export was not found.");
+          }
+
+          log("Step 3: Creating synthesizer");
+          synth = new SynthClass(audioContext);
+
+          // Important: connect synth audio outputs to the speakers.
+          synth.connect(audioContext.destination);
+
+          window.midiSynth = synth;
+          log("Synthesizer created and connected to audio output");
+
+          log("Step 4: Fetching SoundFont");
+          const sfResponse = await fetch(
+            "./assets/soundfonts/ChoriumRevA.SF2"
+          );
+
+          if (!sfResponse.ok) {
+            throw new Error("SoundFont HTTP " + sfResponse.status);
+          }
+
+          const sf2 = await sfResponse.arrayBuffer();
+          log("SoundFont bytes: " + sf2.byteLength);
+
+          log("Step 5: Loading SoundFont");
+          await synth.soundBankManager.addSoundBank(sf2, "main");
+          await synth.isReady;
+          log("SoundFont ready");
+
+          log("Step 6: Creating sequencer");
+          sequencer = new SequencerClass(synth);
+          window.midiSequencer = sequencer;
+          log("Sequencer created");
+
+          log("Step 7: Fetching MIDI");
+          const midiResponse = await fetch(
+            "./assets/midi/trust-in-me.mid"
+          );
+
+          if (!midiResponse.ok) {
+            throw new Error("MIDI HTTP " + midiResponse.status);
+          }
+
+          const midi = await midiResponse.arrayBuffer();
+          log("MIDI bytes: " + midi.byteLength);
+
+          log("Step 8: Loading MIDI into sequencer");
+          sequencer.loadNewSongList([{
+            binary: midi,
+            fileName: "trust-in-me.mid"
+          }]);
+
+          await new Promise((resolve, reject) => {
+            const deadline = Date.now() + 15000;
+
+            const poll = setInterval(() => {
+              if (sequencer.midiData) {
+                clearInterval(poll);
+                resolve();
+              } else if (Date.now() > deadline) {
+                clearInterval(poll);
+                reject(new Error("MIDI loading timed out."));
+              }
+            }, 100);
+          });
+
+          log("Sequencer MIDI metadata received");
+
+          const parsed = await sequencer.getMIDI();
+          duration = parsed.duration || 0;
+
+          log("MIDI duration: " + duration.toFixed(2) + " seconds");
+
+          // Decode the actual lyric event bytes.
+          lyricEvents = (parsed.lyrics || [])
+            .map(event => ({
+              seconds: parsed.midiTicksToSeconds(event.ticks),
+              text: new TextDecoder().decode(
+                Uint8Array.from(event.data ?? [])
+              )
+            }))
+            .filter(event => event.text.length > 0)
+            .sort((a, b) => a.seconds - b.seconds);
+
+          log("Lyric events found: " + lyricEvents.length);
+
+          if (lyricEvents.length === 0) {
+            log("WARNING: No embedded lyrics were found.");
+          }
+
+          loaded = true;
+        }
+
+        log("Starting playback");
+
+        await audioContext.resume();
+
+        pausedAt = 0;
+        showLyrics(0);
+        sequencer.play();
+        startLyricClock();
+
+        pauseButton.disabled = false;
+        log("Playback started. AudioContext: " + audioContext.state);
+      } catch (error) {
+        log("ERROR: " + (error?.stack || error));
+        playButton.disabled = false;
+      }
+    });
+
+    pauseButton.addEventListener("click", () => {
+      if (!sequencer) return;
+
+      sequencer.pause();
+
+      pausedAt = performance.now() / 1000 - startedAt;
+      clearInterval(lyricTimer);
+
+      pauseButton.disabled = true;
+      playButton.disabled = false;
+
+      log("Playback paused");
+    });
+  </script>
+</body>
+</html>

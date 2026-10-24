@@ -1,0 +1,191 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Lemz-Oke | Karaoke • Music • Together</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="shell">
+
+<!-- ==================================
+     HEADER AND BRANDING
+================================== -->
+<div class="logo">
+  <img
+    src="images/lemz-oke-logo2.png"
+    alt="Lemz-Oke"
+    class="brand-logo"
+  >
+</div>
+
+<!-- ==================================
+     UP NEXT TICKER
+     Hidden until JavaScript shows it
+================================== -->
+<div
+  class="ticker hidden"
+  id="tickerBar"
+  aria-live="polite"
+>
+  <b>UP NEXT</b>
+  <div class="crawl" id="ticker">Next song preview</div>
+</div>
+
+    <!-- ==================================
+         MAIN CONTENT
+    =================================== -->
+    <main>
+
+      <!-- KARAOKE STAGE -->
+      <section class="panel stage">
+
+        <div class="stagehead">
+          <span>NOW SINGING</span>
+          <label id="state">READY</label>
+        </div>
+
+        <!-- CURRENT SONG DISPLAY -->
+        <div class="center">
+
+          <div class="orb">♫</div>
+
+          <small>
+            YOUR SONGS. YOUR QUEUE. YOUR STAGE.
+          </small>
+
+          <h1 id="title">
+            Welcome to <em>Lemz-Oke</em>
+          </h1>
+
+          <p id="artist">
+            Choose a demo song or reserve one from the list.
+          </p>
+
+          <!-- LYRICS DISPLAY -->
+          
+            <div class="lyrics" id="lyricsDisplay" aria-live="polite">
+                <p class="lyric-label">♪ NOW SINGING ♪</p>
+                <p class="current-lyric" id="currentLyric">
+                Your lyrics will appear here
+                </p>
+                <p class="next-lyric" id="nextLyric">
+                Lyrics will follow when playback is connected
+                </p>
+            </div>
+
+
+        </div>
+
+        <!-- PLAYBACK CONTROLS -->
+        <div class="controls">
+          <button id="prev" type="button">
+            ⏮ PREVIOUS
+          </button>
+
+          <button
+            class="primary"
+            id="play"
+            type="button"
+          >
+            ▶ PLAY DEMO
+          </button>
+
+          <button id="next" type="button">
+            NEXT ⏭
+          </button>
+        </div>
+
+        <footer>
+          DEMO UI · REAL PLAYBACK NOT CONNECTED YET
+        </footer>
+
+      </section>
+
+      <!-- ==================================
+           SIDEBAR
+      =================================== -->
+      <aside>
+
+        <!-- SONG QUEUE -->
+        <section class="panel">
+
+          <div class="row">
+            <div>
+              <small>THE LINEUP</small>
+              <h2>
+                Song Queue
+                <i id="count">0</i>
+              </h2>
+            </div>
+
+            <button
+              class="clear"
+              id="clear"
+              type="button"
+            >
+              CLEAR
+            </button>
+          </div>
+
+          <ol id="queue">
+            <li class="empty">
+              Your queue is waiting for its first star ✨
+            </li>
+          </ol>
+
+        </section>
+
+        <!-- SONG SEARCH AND RESERVATION -->
+        <section class="panel reserve">
+
+          <small>RESERVE A SONG</small>
+
+          <h2>Pick your next hit</h2>
+
+          <input
+            id="search"
+            type="search"
+            placeholder="Search title or artist…"
+            autocomplete="off"
+            aria-label="Search songs by title or artist"
+          >
+
+          <div id="choices"></div>
+
+          <p class="hint">
+            Sample titles only. MIDI playback and real song
+            packages come later.
+          </p>
+
+        </section>
+
+      </aside>
+
+    </main>
+
+    <!-- ==================================
+         BOTTOM BAR
+    =================================== -->
+    <div class="bottom">
+      <span>
+        LEMZ-OKE <b>PROTOTYPE 0.1</b>
+      </span>
+
+      <span>
+        DESIGNED FOR THE BIG SCREEN ✦
+      </span>
+    </div>
+
+  </div>
+
+  <!-- APPLICATION SCRIPT -->
+  <script src="js/app.js"></script>
+
+</body>
+</html>

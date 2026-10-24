@@ -1,0 +1,658 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Inter:wght@400;600;700&display=swap');
+
+/* ========================================
+   LEMZ-OKE — THEME
+======================================== */
+
+:root {
+  --cyan: #19eaff;
+  --blue: #2678ff;
+  --pink: #ff2ed1;
+  --purple: #9b4dff;
+  --muted: #93a2c5;
+
+  --bg-dark: #050714;
+  --panel-dark: #0d142b;
+  --border: #1d2a4d;
+  --text: #f4f7ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* Official Lemz-Oke logo */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+}
+
+.brand-logo {
+  display: block;
+  width: min(100%, 560px);
+  height: auto;
+  max-height: 150px;
+  object-fit: contain;
+  object-position: left center;
+  filter: drop-shadow(0 0 14px #2678ff55);
+}
+
+@media (max-width: 520px) {
+  .brand-logo {
+    width: min(100%, 360px);
+    max-height: 110px;
+  }
+}
+
+.brand-header {
+  width: 100%;
+  margin-bottom: 22px;
+}
+
+.brand-header-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+}
+
+.brand-logo {
+  display: block;
+  width: 480px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+
+/* KARAOKE LYRICS DISPLAY */
+.lyrics {
+  width: 100%;
+  min-height: 190px;
+  margin: 24px auto;
+  padding: 24px 18px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 229, 255, 0.08),
+    rgba(151, 71, 255, 0.12),
+    rgba(255, 0, 170, 0.07)
+  );
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 18px;
+  box-shadow: 0 0 24px rgba(0, 229, 255, 0.08);
+}
+
+.lyric-label {
+  margin: 0;
+  color: #00e5ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+.current-lyric {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight: 800;
+  line-height: 1.35;
+  text-shadow: 0 0 14px rgba(0, 229, 255, 0.45);
+}
+
+.next-lyric {
+  margin: 0;
+  color: #a9b6d3;
+  font-size: clamp(16px, 1.8vw, 24px);
+  line-height: 1.4;
+  opacity: 0.75;
+}
+
+@media (max-width: 700px) {
+  .lyrics {
+    min-height: 160px;
+    padding: 20px 12px;
+  }
+}
+
+
+/* ========================================
+   PAGE BACKGROUND
+======================================== */
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: Inter, Arial, sans-serif;
+
+  background:
+    radial-gradient(ellipse at 15% 0%, #14204a, transparent 45%),
+    radial-gradient(ellipse at 90% 35%, #280b3b, transparent 40%),
+    var(--bg-dark);
+}
+
+.shell {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 26px 32px;
+}
+
+/* ========================================
+   HEADER AND LOGO
+======================================== */
+
+header,
+.logo,
+.row,
+.stagehead,
+.controls,
+.bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+header {
+  margin-bottom: 22px;
+}
+
+.logo {
+  justify-content: flex-start;
+}
+
+.play {
+  display: grid;
+  place-items: center;
+
+  width: 54px;
+  height: 54px;
+
+  border: 1px solid var(--cyan);
+  border-radius: 15px;
+
+  color: var(--cyan);
+  font-size: 24px;
+
+  box-shadow: 0 0 25px #00cfff28;
+}
+
+.logo b,
+.logo strong {
+  font: 800 30px Orbitron, Arial, sans-serif;
+}
+
+.logo b {
+  color: var(--cyan);
+  text-shadow: 0 0 18px #00d9ff66;
+}
+
+.logo strong {
+  color: var(--pink);
+}
+
+.logo small {
+  display: block;
+  color: #aab7d9;
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
+.status,
+small,
+.stagehead,
+footer,
+.bottom {
+  color: #aebce0;
+  font: 700 10px Orbitron, Arial, sans-serif;
+  letter-spacing: 1.5px;
+}
+
+.status {
+  color: #b7c5e6;
+}
+
+/* ========================================
+   UP NEXT TICKER
+   Hidden by default.
+   JavaScript can show it near song end.
+======================================== */
+
+.ticker {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  margin-bottom: 22px;
+  overflow: hidden;
+
+  border: 1px solid #244a71;
+  border-radius: 12px;
+
+  background: #071426;
+}
+
+.ticker > b {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+
+  padding: 0 20px;
+
+  color: #041022;
+  white-space: nowrap;
+
+  background: linear-gradient(
+    100deg,
+    var(--cyan),
+    var(--blue)
+  );
+}
+
+.crawl {
+  padding-left: 100%;
+  color: #d8f9ff;
+  font-weight: 700;
+  white-space: nowrap;
+
+  animation: ticker-scroll 20s linear infinite;
+}
+
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ========================================
+   MAIN LAYOUT
+======================================== */
+
+main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
+  gap: 22px;
+}
+
+.panel {
+  padding: 22px;
+
+  border: 1px solid var(--border);
+  border-radius: 20px;
+
+  background: linear-gradient(
+    145deg,
+    #0d142bed,
+    #080b1af5
+  );
+
+  box-shadow: 0 20px 50px #0005;
+}
+
+/* ========================================
+   KARAOKE STAGE
+======================================== */
+
+.stage {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 620px;
+  padding: 0;
+}
+
+.stagehead {
+  padding: 22px 25px;
+  border-bottom: 1px solid #1b2747;
+}
+
+.stagehead span,
+small {
+  color: var(--cyan);
+}
+
+.stagehead label {
+  padding: 7px 12px;
+
+  border: 1px solid #405174;
+  border-radius: 20px;
+}
+
+/* ========================================
+   SONG DISPLAY
+======================================== */
+
+.center {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 25px;
+  text-align: center;
+}
+
+.orb {
+  display: grid;
+  place-items: center;
+
+  width: 86px;
+  height: 86px;
+  margin-bottom: 22px;
+
+  border: 1px solid var(--cyan);
+  border-radius: 50%;
+
+  color: var(--cyan);
+  font-size: 40px;
+
+  box-shadow: 0 0 35px #00cfff25;
+}
+
+.center h1 {
+  margin: 16px 0 8px;
+  font: 800 clamp(27px, 3vw, 46px) Orbitron, Arial, sans-serif;
+}
+
+.center h1 em {
+  color: var(--pink);
+  font-style: normal;
+}
+
+.center p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* ========================================
+   LYRICS
+======================================== */
+
+.lyrics {
+  margin: 25px 0;
+  line-height: 1.8;
+}
+
+.lyrics p {
+  color: #7181a5;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.lyrics b {
+  font-size: 21px;
+  text-shadow: 0 0 18px #00eaff88;
+}
+
+/* ========================================
+   PLAYBACK CONTROLS
+======================================== */
+
+.controls {
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 18px;
+}
+
+.controls button,
+.song button {
+  padding: 13px 16px;
+
+  border: 1px solid #2c3c62;
+  border-radius: 10px;
+
+  color: #dce7ff;
+  background: #111a34;
+
+  font: 700 10px Orbitron, Arial, sans-serif;
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.controls button:hover,
+.song button:hover {
+  transform: translateY(-2px);
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px #19eaff20;
+}
+
+.controls .primary {
+  border: 0;
+  color: #061023;
+
+  background: linear-gradient(
+    100deg,
+    var(--cyan),
+    #4386ff
+  );
+}
+
+/* ========================================
+   STAGE FOOTER
+======================================== */
+
+footer {
+  padding: 14px;
+  border-top: 1px solid #182343;
+
+  color: #6d7da4;
+  text-align: center;
+}
+
+/* ========================================
+   SIDEBAR
+======================================== */
+
+aside {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+h2 {
+  margin: 8px 0;
+  font: 700 20px Orbitron, Arial, sans-serif;
+}
+
+.row {
+  align-items: center;
+}
+
+.row i {
+  padding: 4px 8px;
+
+  border-radius: 7px;
+
+  color: var(--cyan);
+  background: #172345;
+
+  font: 600 12px Inter, Arial, sans-serif;
+}
+
+.clear {
+  border: 0;
+  color: var(--pink);
+  background: none;
+
+  font: 700 10px Orbitron, Arial, sans-serif;
+  cursor: pointer;
+}
+
+/* ========================================
+   SONG QUEUE
+======================================== */
+
+ol {
+  max-height: 240px;
+  margin: 18px 0 0;
+  padding: 0;
+
+  overflow-y: auto;
+  list-style: none;
+}
+
+ol li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 0;
+  border-bottom: 1px solid #192342;
+
+  font-size: 12px;
+}
+
+ol li span {
+  flex: 1;
+}
+
+.empty {
+  color: #8290b1;
+}
+
+.remove {
+  padding: 5px 9px;
+
+  border: 1px solid #382348;
+  border-radius: 7px;
+
+  color: #ff8ee8;
+  background: #1c1128;
+
+  cursor: pointer;
+}
+
+/* ========================================
+   SONG SEARCH AND RESERVATION
+======================================== */
+
+.reserve input {
+  width: 100%;
+  margin: 15px 0 10px;
+  padding: 13px;
+
+  border: 1px solid #26375e;
+  border-radius: 10px;
+
+  color: white;
+  background: #060a18;
+}
+
+.song {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 7px 0;
+}
+
+.song div {
+  flex: 1;
+}
+
+.song b {
+  display: block;
+  font-size: 12px;
+}
+
+.song span {
+  display: block;
+  margin-top: 4px;
+
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.song button {
+  padding: 8px 12px;
+  color: var(--cyan);
+}
+
+.hint {
+  color: #7282a6;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* ========================================
+   BOTTOM BAR
+======================================== */
+
+.bottom {
+  justify-content: space-between;
+  padding: 22px 4px 0;
+
+  color: #7180a2;
+}
+
+.bottom b {
+  margin-left: 8px;
+  color: var(--pink);
+}
+
+/* ========================================
+   RESPONSIVE LAYOUT
+======================================== */
+
+@media (max-width: 850px) {
+  .shell {
+    padding: 16px;
+  }
+
+  main {
+    grid-template-columns: 1fr;
+  }
+
+  .status {
+    font-size: 8px;
+  }
+
+  .stage {
+    min-height: 550px;
+  }
+}
+
+@media (max-width: 520px) {
+  header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .bottom span:last-child {
+    display: none;
+  }
+
+  .logo b,
+  .logo strong {
+    font-size: 25px;
+  }
+}
